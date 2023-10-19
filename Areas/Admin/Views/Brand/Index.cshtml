@@ -1,0 +1,92 @@
+﻿@model IEnumerable<Brand>
+@{
+    ViewData["Title"] = "Brand";
+}
+<div class="container-fluid">
+    <div class="card border-info">
+        <div class="card-header d-flex justify-content-between">
+            <h3 class="card-title align-middle">Danh mục nhãn hiệu</h3>
+            <a class="btn btn-primary" asp-controller="Brand" asp-action="Create">Thêm nhãn hiệu</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table id="main_table" class="table-card align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col">Mã</th>
+                            <th scope="col">Tên nhãn hiệu</th>
+                            <th scope="col">Tools</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr scope="row">
+                                <td>@item.Id</td>
+                                <td>@item.BrandName</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" style="display: inline-block" class="delete-form">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="fas fa-trash-alt" style="background-color: transparent; border: none;"></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    #main_table_filter {
+        margin-bottom: 10px;
+    }
+</style>
+@section Scripts{
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowreorder/1.2.8/js/dataTables.rowReorder.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script>
+        $(document).on("submit", ".delete-form", () => confirm("Bạn có chắc muốn xóa? "));
+            //active data table for main table
+            $(document).ready(function () {
+                $('#main_table').DataTable({
+                    "language": {
+                        "emptyTable": "Không tìm thấy nhãn hiệu",
+                        "info": "Hiển thị nhãn hiệu từ _START_ đến _END_ của _TOTAL_ nhãn hiệu",
+                        "infoEmpty": "Hiển thị 0 đến 0 của 0 nhãn hiệu",
+                        "infoFiltered": "(lọc từ tổng cộng _MAX_  nhãn hiệu)",
+                        "infoPostFix": "",
+                        "thousands": ",",
+                        "lengthMenu": "Hiển thị _MENU_ nhãn hiệu",
+                        "loadingRecords": "Đang tải...",
+                        "processing": "Đang xử lí...",
+                        "search": "Tìm kiếm:",
+                        "zeroRecords": "Không tìm thấy nhãn hiệu nào phù hợp",
+                        "paginate": {
+                            "first": "Đầu",
+                            "last": "Cuối",
+                            "next": "Sau",
+                            "previous": "Trước"
+                        }
+                    },
+                    responsive: true,
+                    rowReorder: {
+                        selector: 'td:nth-child(5)'
+                    },
+
+                })
+            });
+    </script>
+}

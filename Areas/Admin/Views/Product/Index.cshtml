@@ -1,0 +1,113 @@
+﻿@using ShoesLover.Data
+@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Product";
+    string GetShortStringFormat(string s)
+    {
+
+        return s.Length > 40 ? s.Substring(0, 40) + "..." : s;
+    }
+    StoreContext context = ViewData["context"] as StoreContext;
+    IEnumerable<SubCategory> categoryMasters = context.GetSubCategories();
+    IEnumerable<Brand> brands = context.GetBrands();
+}
+<div class="container-fluid">
+    <div class="card border-info">
+        <div class="card-header d-flex justify-content-between">
+            <h3 class="card-title align-middle">Danh mục sản phẩm</h3>
+            <a class="btn btn-primary" asp-action="CreateProduct">Thêm sản phẩm</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table id="main_table" class="table-card align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th scope="col">Mã</th>
+                            <th scope="col">Tên</th>
+                            <th scope="col">Danh mục</th>
+                            <th scope="col">Thương hiệu</th>
+                            <th scope="col">Giá thường</th>
+                            <th scope="col">Mô tả</th>
+                            <th scope="col">Tools</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            string categoryName = context.GetSubCategoryById(item.SubCategoryId).SubCategoryName;
+                            string brandName = context.GetBrandById(item.BrandId).BrandName;
+                            <tr scope="row">
+                                <td>@item.Id</td>
+                                <td>
+                                    <a asp-action="ProductDetails" asp-route-id="@item.Id" style="text-decoration: underline">@item.ProductName <i class="fas fa-info-circle" style="font-size: small"></i></a>                                
+                                </td>
+                                <td>@categoryName</td>
+                                <td>@brandName</td>
+                                <td>@String.Format("{0:0,0;0} VND",item.RegularPrice)</td>
+                                <td>@GetShortStringFormat(item.Description)</td>
+                                <td>
+                                    <a asp-action="EditProduct" asp-route-id="@item.Id">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="DeleteProduct" asp-route-id="@item.Id" style="display: inline-block" class="delete-form">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="fas fa-trash-alt" style="background-color: transparent; border: none;"></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+    <style>
+
+        #main_table_filter {
+            margin-bottom: 10px;
+        }
+    </style>
+    @section Scripts{
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowreorder/1.2.8/js/dataTables.rowReorder.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+
+        <script>
+            $(document).on("submit", ".delete-form", () => confirm("Bạn có chắc muốn xóa? "));
+            //active data table for main table
+            $(document).ready(function () {
+                $('#main_table').DataTable({
+                    "language": {
+                        "emptyTable": "Không tìm thấy sản phẩm",
+                        "info": "Hiển thị sản phẩm từ _START_ đến _END_ của tổng _TOTAL_ sản phẩm",
+                        "infoEmpty": "Hiển thị 0 đến 0 của 0 sản phẩm",
+                        "infoFiltered": "(lọc từ tổng cộng _MAX_  sản phẩm)",
+                        "infoPostFix": "",
+                        "thousands": ",",
+                        "lengthMenu": "Hiển thị _MENU_ sản phẩm",
+                        "loadingRecords": "Đang tải...",
+                        "processing": "Đang xử lí...",
+                        "search": "Tìm kiếm:",
+                        "zeroRecords": "Không tìm thấy sản phẩm nào phù hợp",
+                        "paginate": {
+                            "first": "Đầu",
+                            "last": "Cuối",
+                            "next": "Sau",
+                            "previous": "Trước"
+                        }
+                    },
+                    responsive: true,
+                    rowReorder: {
+                        selector: 'td:nth-child(5)'
+                    },
+
+                })
+            });
+        </script>
+    }

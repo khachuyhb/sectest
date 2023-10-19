@@ -1,0 +1,834 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model ProductObject
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link href="~/css/modal__size.css" rel="stylesheet" />
+<link href="~/css/modal_size.css" rel="stylesheet" />
+<link href="~/css/product_detail.css" rel="stylesheet" />
+<div class="product-detail">
+    <div class="grid wide ">
+        <div class="row">
+            <div class="col l-12 m-12 c-0">
+                <div style="margin-bottom:20px;" class="product-top">
+                    <a href="../home/index">Trang chủ </a><span>&rarr;</span>
+                    <a href="/product/ShowProductsCate?page=1&cate_id=@Model.Category_id"> @Model.CategoryName </a><span>&rarr;</span>
+                    <a href="/product/ShowProducts?page=1&subcate_id=@Model.Subcategory_id"> @Model.SubcategoryName </a><span>&rarr;</span>
+                    <a href="" style="color: red; font-weight:700;"> @Model.ProductName</a>
+                </div>
+            </div>
+            <div class="product-content row">
+                <div class="col l-6 m-6 c-12 product-content-left ">
+                    <div class="col l-12 m-12 c-0">
+                        <div style="height:100%" class="product-content-left-big-img img-big  ">
+                            <img style="height:70% ; border-radius:15px;" id="img_big" src="~/image/@Model.ImgBig1" alt="">
+                        </div>
+                    </div>
+                    <div class="col l-12 m-12 c-0">
+                        <div id="img_detail" class="product-content-left-small-img img-bottom-small img-bottom-regular">
+                            <img class="img_1 active-small-img img-small-item" style="width:80px;" src="~/image/@Model.ImgBig1" alt="">
+                            <img style="width:80px;" class="img_2 img-small-item" src="~/image/@Model.ImgBig2" alt="">
+                            <img style="width:80px;" class="img_3 img-small-item" src="~/image/@Model.ImgBig3" alt="">
+                            <img style="width:80px;" class="img_4 img-small-item" src="~/image/@Model.ImgBig4" alt="">
+                            <img style="width:80px;" class="img_5 img-small-item" src="~/image/@Model.ImgBig5" alt="">
+                            <img style="width:80px;" class="img_6 img-small-item" src="~/image/@Model.ImgBig6" alt="">
+                        </div>
+                    </div>
+                </div>
+                @{ double regular = Model.RegularPrice; <!--Đặt dấu . vào tiền-->
+                    double sale = Model.SalePrice;
+                    string regular_price = regular.ToString("N0",
+                    System.Globalization.CultureInfo.GetCultureInfo("de"));
+                    string sale_price = sale.ToString("N0",
+                    System.Globalization.CultureInfo.GetCultureInfo("de"));
+                }
+                <div class="col l-6 m-6 c-12 product-content-right">
+                    <div class="product-content-right-name">
+                        <h1>@Model.ProductName</h1>
+                        <p style="margin:20px 0px; font-size:14px;">MSP: @Model.ProductTag</p>
+                    </div>
+                    <div class="product-content-right-price">
+                        <p class="p-money"><span class="span-money" style="font-size:14px; color:rgb(153,153,153); text-decoration:line-through; font-weight:400;">@regular_price<sup>đ </sup></span><span style="font-size:19px">@sale_price</span><sup>đ</sup></p>
+
+                    </div>
+                    <div class="product-content-right-color">
+                        <p style="font-weight:700; font-size:14px;">
+                            Màu sắc: <span style="color:rgb(153,153,153);">@Model.ColorName</span>
+
+                        </p>
+                        <input type="hidden" value="@Model.ProductId" id="product-id" />
+                        <input type="hidden" value="@Model.ProductName" id="product-name" />
+                        <input type="hidden" value="@Model.ImgBig1" id="product-img" />
+                        <input type="hidden" value="@Model.RegularPrice" id="product-regular" />
+                        <input type="hidden" value="@Model.SalePrice" id="product-sale" />
+                        <a id="product-url" href="/product/ShowProductDetailObject?color_id=@Model.ColorId&product_id=@Model.ProductId"></a>
+
+
+                        @{int color_url = Convert.ToInt32(Context.Request.Query["color_id"]); //Lấy parameter page trên url
+                            int productid_url = Convert.ToInt32(Context.Request.Query["product_id"]);
+                            <div class="product-content-right-color-img img-color  " style="display: flex;">
+                                @foreach (var item in ViewBag.ShowColorProduct)
+                                {
+                                    <li style="list-style:none;" class="li-color li-default-border" value="@item.Id"><a class="li-active" href="/product/ShowProductDetailObject?color_id=@item.Id&product_id=@Model.ProductId"> <img class="img-product-color" src="~/image/@item.ColorImage" alt=""></a></li>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="product-content-right-size">
+                        <p style="font-weight:700; font-size:14px;">
+                            <input type="hidden" id="size-id" />
+                            <span>Size: <span id="load_size"></span></span>
+                        </p>
+                        <ul class="size" id="my-li-size">
+                            @foreach (var item in ViewBag.GetSizeByID)
+                            {
+                                <li tabindex="0" class="size-name  li-border-size" id="size-name-@item.Id" style="cursor: pointer; " value="@item.Id">@item.SizeName</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="product-content-right-quantity row">
+                        <p style="font-weight:700; font-size:14px;">Số lượng: </p>
+                        <span class="btn_minus btn_buy" id="btn_minus_id"><i class="fa fa-minus"></i></span>
+                        <input id="input_quantity" type="number" min="1" value="1">
+                        <span class="btn_plus btn_buy" id="btn_plus_id"><i class="fa fa-plus"></i></span>
+                    </div>
+                    <p id="check_size_empty"></p>
+                    <p id="check_quantity_empty"></p>
+                    <div class="product-content-right-button ">
+                        <a style="width: 200px;" id="add-to-cart" class="btn_buy">
+                            <i class="fas fa-shopping-bag"></i>
+                            <p style="position: relative; bottom:-2px;">THÊM VÀO GIỎ HÀNG</p>
+                        </a>
+                        <a style="width:200px;" class="btn_buy" @*asp-controller="Order" asp-action="Checkout"*@ id="btn-checkout">
+                            <p style="text-align: center; transform: translateY(50%); padding-bottom: 5px;">MUA NGAY</p>
+                        </a>
+                    </div>
+                    <div class=" product-content-right-icon  ">
+                        <div class="   product-content-right-icon-item ">
+                            <i class="fas fa-phone-alt"></i>
+                            <p>Hotline</p>
+                        </div>
+                        <div class=" product-content-right-icon-item ">
+                            <i class="far fa-comments"></i>
+                            <p>Chat</p>
+                        </div>
+                        <div class=" product-content-right-icon-item">
+                            <i class="far fa-envelope"></i>
+                            <p>Mail</p>
+                        </div>
+
+                    </div>
+                    <!-- <div class="product-content-right-qr">
+                        <img src="" alt="">
+                    </div> -->
+                    <div class="product-content-right-bottom">
+                        <div id="btn-arrow-down" class="product-content-right-bottom-top">
+                            <i class="fas fa-chevron-down" style="position: relative;top:2px;"></i>
+                        </div>
+                        <div class="product-content-right-bottom-content">
+                            <div class="product-content-right-bottom-content-title ">
+                                <div class="product-content-right-bottom-content-title-item-detail detail-product border-detail">
+                                    <p id="set-img-bottom-detail" style="padding-top:8px">Chi tiết sản phẩm</p>
+                                </div>
+                                <div class="product-content-right-bottom-content-title-item-gurantee guarantee-product ">
+                                    <p id="set-img-bottom-guarantee" style="padding-top:8px">Chính sách bảo hành</p>
+                                </div>
+                                <div class="btn-size-detail" style="padding: 8px 10px; position: relative; bottom: -1px;">
+                                    <p style=" position: relative; cursor:pointer; bottom: -6px;">Tham kháo size</p>
+                                </div>
+                                <!-- <div class="product-content-right-bottom-content-title-item">
+                                         <p>Tham khảo size</p>
+                                </div> -->
+                            </div>
+                            <div class="product-content-right-bottom-content-description">
+                                <div class="product-content-right-bottom-content-description-detail ">
+                                    <div class="product-content-right-bottom-content-description-detail-summary ">
+                                        <div class="product-content-right-bottom-content-description-detail-summary-right">
+                                            <p>Model</p>
+                                            <p>Giới tính</p>
+                                            <p>Season</p>
+                                            <p>Thương hiệu</p>
+                                        </div>
+                                        <div class="product-content-right-bottom-content-description-detail-summary-left">
+                                            <p>@Model.ProductTag</p>
+                                            <p id="gender-name"></p>
+                                            <p>SS21</p>
+                                            <p>@Model.BrandName</p>
+                                        </div>
+                                    </div>
+                                    <p class="product-content-right-bottom-content-description-detail-title">
+                                        <b>
+                                            Mô Tả
+                                            Sản Phẩm
+                                        </b>
+                                    </p>
+                                    <span>• Chất liệu: Sợi vải và cao su đàn hồi chịu nhiệt tốt.</span><br><br>
+                                    <span>
+                                        • Thiết kế: Thân giày bằng vải lưới, thoải mái và thoáng khí, thiết kế kiểu dáng đơn
+                                        giản, điều chỉnh dáng chân. Sử dụng công nghệ eye piece body film, nâng cao cảm giác
+                                        chất lượng cho người mang. Đế ngoài IP hoàn toàn mới, mềm mại và êm ái.
+                                    </span><br><br>
+                                    <span>
+                                        • Phù hợp:Vui chơi dạo phố, tiệt tùng, đi làm hay tập luyện thể thao nhẹ
+                                        nhàng.
+                                    </span> <br><br>
+                                    <span> • Xuất xứ thương hiệu: Italia</span>
+                                </div>
+                                <div class="product-content-right-bottom-content-description-guarantee ">
+                                    <b>(1) Phạm vi áp dụng </b><br><br>
+
+                                    <span>
+                                        Áp dụng đối với sản phẩm phân phối tại hệ thống cửa hàng toàn quốc của Hoàng Phúc
+                                        Quốc Tế, thông qua trang thương mại điện tử tại địa chỉ https://hoang-phuc.com/ và
+                                        đối tác (hợp pháp) trên lãnh thổ Việt Nam do Hoàng Phúc Quốc Tế chỉ định tuỳ từng
+                                        thời điểm.
+                                    </span><br><br>
+
+                                    <b> (2) Điều kiện áp dụng</b><br><br>
+                                    <table>
+                                        <tr>
+                                            <th>Sản phẩm áp dụng</th>
+                                            <th>Phạm vi bảo hành</th>
+                                            <th>Thời gian bảo hành</th>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Sản phẩm nguyên giá và sản phẩm có mức giảm giá thấp hơn 70%</b></td>
+                                            <td>Keo chỉ</td>
+                                            <td>180 ngày</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Sản phẩm giảm giá từ 70%</b></td>
+                                            <td>Không áp dụng bảo hành</td>
+                                            <td>Không áp dụng bảo hành</td>
+                                        </tr>
+
+                                    </table>
+                                    <br><br>
+                                    <span>
+                                        (1) Điều kiện Bảo Hành: sản phẩm còn trong thời gian bảo hành. Ngoài thời gian Bảo
+                                        Hành, khách hàng có nhu cầu vui lòng sử dụng dịch vụ (tính phí) của Trung Tâm Bảo
+                                        Hành.
+                                    </span><br><br>
+
+                                    <span>
+                                        (2) Sản phẩm bị lỗi phát sinh từ việc sử dụng và/hoặc bảo quản không đúng cách không
+                                        thuộc phạm vi Bảo Hành ngay cả trong thời hạn quy định.
+                                    </span><br><br>
+
+                                    <span>
+                                        (3) Chính sách Bảo Hành không áp dụng đối với các phụ kiện sau: vớ, dây giày, xi,
+                                        lót giày.
+                                    </span><br><br>
+
+                                    <span>
+                                        (4) Chính sách Bảo Hành không áp dụng đối với sản phẩm mua ở nước ngoài (không
+                                        được phân phối bởi Hoàng Phúc Quốc Tế).
+                                    </span>
+                                </div>
+                                <div class="product-content-right-bottom-content-description-size">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Show ra các sản phẩm liên quan-->
+            <div style="width:100%;" class="product-related">
+                <div class=" col l-12 m-12 c-12">
+                    <div class="product-related-title">
+                        <p style="font-size:15px;">Xem tiếp sản phẩm liên quan</p>
+                    </div>
+                    <input class="li-active-color" type="hidden" /> <!--Tạo cái hidden để tạo li-active-color cho việc active size khi chọn-->
+                </div>
+                <div class=" product-content row">
+                    @foreach (var item in ViewBag.SPlienquan)
+                    {
+                        <div class="col l-3 m-3 c-12 product-content-item">
+                            @{ Color a = new Color();
+                                a = item.productcolorMaster[0];
+                                <li class="li-product-id" value="@item.Id" style="list-style:none;">
+                                    <a href="ShowProductDetailObject?color_id=@a.Id&product_id=@item.Id" class="product">
+                                        <img id="product-img-@item.Id" class="product-image sale-tag" src="~/image/@item.DefaultImage" alt="">
+                                        <h4 class="product-name">@item.ProductName</h4>
+                                    </a>
+                                    <p class="sale-label-relate">
+                                        <span>SALE</span>
+                                    </p>
+                                </li>
+                                double regular_pro_relate = item.RegularPrice; <!--Đặt dấu . vào tiền-->
+                                double sale_pro_relate = item.SalePrice;
+                                string regular_price_relate = regular.ToString("N0",
+                                System.Globalization.CultureInfo.GetCultureInfo("de"));
+                                string sale_price_relate = sale.ToString("N0",
+                                System.Globalization.CultureInfo.GetCultureInfo("de"));
+                            }
+                            <p class="p-money price-relate" style="text-align:center;"><span class="span-money" style="text-decoration:line-through; color:rgb(153,153,153);">@regular_price_relate<sup>đ</sup></span><span></span><span style="color: red;">@sale_price_relate<sup>đ</sup></span></p>
+                            <div class="watcher-product">
+                                <ul style=" position: relative; bottom: 30px;">
+                                    @foreach (var index in item.productcolorMaster)
+                                    {
+                                        <li value="@index.Id" class="li-color-@item.Id">
+                                            <a>
+                                                <img id="color_small_@index.Id" class="img-color-small" src="~/image/@index.ColorImage" alt="">
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="product-variant">
+                                @foreach (var index in item.productvariant)
+                                {
+                                    <input class="variant-img-@item.Id" type="hidden" value="@index.ColorId" src="~/image/@index.ProductVariantImage" />
+
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="review-comment ">
+
+                    <div style="margin-bottom: 15px;">Đánh Giá - Nhận Xét Từ Khách Hàng</div>
+                    <div>
+                        @{
+                            double rating_d = ViewBag.ShowRating;
+                            int rating;
+                            var color = "";
+                            if (rating_d == 0)
+                            {
+                                rating = 0;
+                                color = "";
+                            }
+                            else
+                            {
+                                rating = Convert.ToInt32(Math.Ceiling(rating_d));
+                                color = "";
+                            }
+
+                            // int rating = Convert.ToInt32(Math.Ceiling(rating_d));
+                            // var color = "";
+                            <ul class="list-rating" style="margin-bottom:20px;" title="AverageRating">
+
+                                @for (int i = 1; i <= 5; i++)
+                                {
+
+
+                                    if (i <= rating)
+                                    {
+                                        color = "color:#ffcc00;";
+                                    }
+                                    else
+                                    {
+                                        color = "color:#ccc;";
+                                    }
+
+
+
+
+                                    <li class="rating" title="Star rating" id="@productid_url-@color_url-@i" data-index="@i" data-rating="@rating"
+                                        data-product_id="@productid_url" data-color_id="@color_url" style="color:#ccc;cursor:pointer; font-size:30px; @color">&#9733;</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div id="comment-show"></div>
+
+                    <input type="hidden" name="comment_product_id" class="comment_product_id" value="@Model.ProductId" />
+
+
+
+
+                    <p style="margin-bottom:20px">Bình luận</p>
+                    <div class="comment-customer">
+                        <input class="input-comment comment-name" type="text" placeholder="Tên" />
+                    </div>
+                    <textarea type="text" class="comment-content space-write-comment"> </textarea>
+                    <input class="btn-send-comment" type="button" value="Gửi bình luận" />
+                    <div style="color: red;" id="notify-comment"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!---Tham khảo size-->
+<div class="modal">
+    <div class="modal-overlay">
+
+    </div>
+    <div class="modal-body">
+
+        <div class="modal-body-header">
+            <div style="font-size:20px; font-weight:500;">Bảng tư vấn size</div>
+            <div class="btn-close" style="color: rgb(153,153,153); font-weight:500">X</div>
+        </div>
+        <div class="modal-table">
+            <table>
+                <tr>
+                    <td rowspan="4"><img src="~/image/size_foot_img.webp" alt=""></td>
+                    <td style="height:40px; vertical-align: middle; text-align: left;" colspan="8">SIZE GIÀY DÉP</td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: middle; text-align: left;" rowspan="2">Tên gọi</td>
+                    <td style="vertical-align: middle; text-align: left;" colspan="7">SIZE</td>
+                </tr>
+                <tr style="text-align: center;">
+                    <td>36</td>
+                    <td>37</td>
+                    <td>38</td>
+                    <td>39</td>
+                    <td>40</td>
+                    <td>41</td>
+                    <td>42</td>
+                </tr>
+                <tr style="text-align: center;">
+                    <td style="height:40px ;vertical-align: middle;  text-align: left;">Chiều dài bàn chân(cm)</td>
+                    <td>22</td>
+                    <td>23</td>
+                    <td>23.8</td>
+                    <td>24.6</td>
+                    <td>25.4</td>
+                    <td>26.2</td>
+                    <td>27.1</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="btn-close button-close-modal">Đóng</div>
+
+
+    </div>
+
+</div>
+
+
+
+<style>
+
+    .list-rating {
+        display: flex;
+    }
+
+    li {
+        list-style: none;
+    }
+
+    .li-default-border {
+        border: 2px solid rgb(153,153,153);
+    }
+
+    .li-active-color {
+        border: 2px solid black;
+    }
+
+    .li-active-border {
+        border: 2px solid black;
+    }
+
+    .border-detail {
+        border-bottom: 2px solid black;
+        position: relative;
+        bottom: -2px;
+    }
+
+    .img-color-small {
+        width: 30px;
+    }
+
+    .btn-size-detail p:focus {
+    }
+</style>
+<script src="~/js/productHover.js"></script>
+<script src="~/js/product_detail.js"></script>
+<script>
+
+    function remove_background(product_id, color_id) {
+        for (var count = 1; count <= 5; count++) {
+            $("#" + product_id + "-" + color_id + "-" + count).css("color", "#ccc");
+        }
+    };
+
+
+    $(document).on('mouseenter', '.rating', function () {
+        var index = $(this).data("index");
+        var product_id = $(this).data("product_id");
+        var color_id = $(this).data("color_id");
+        remove_background(product_id, color_id);
+        for (var count = 1; count <= index; count++) {
+            $("#" + product_id + "-"+color_id+"-" + count).css("color", "#ffcc00");
+        }
+    });
+
+
+    $(document).on('mouseleave', '.rating', function () {
+        var index = $(this).data("index");
+        var product_id = $(this).data("product_id");
+        var color_id = $(this).data("color_id");
+        var rating = $(this).data("rating");
+        remove_background(product_id, color_id);
+        for (var count = 1; count <= rating; count++) {
+            $("#" + product_id + "-" + color_id + "-" + count).css("color", "#ffcc00");
+        }
+    });
+
+    $(document).on('click', '.rating', function () {
+        var index = $(this).data("index");
+        var product_id = $(this).data("product_id");
+        var color_id = $(this).data("color_id");
+        $.ajax({
+            url: "../rating/InsertRating",
+            type: "POST",
+            dataType: "html",
+            data: { product_id: product_id, index: index, color_id: color_id },
+            success: function (data) {           //Xoá tất cả dữ liệu trước đó
+                alert("Bạn đã đánh giá sản phẩm " + index + "trên 5 sao");
+            },
+            error: () => alert("something wrong")
+        });
+
+    });
+
+
+    $(".btn-size-detail").click(function () {
+        $("#main-header").css("background", "rgba(255,255,255,0.4)");
+        $("#main-header").css({ 'box-shadow': '' });
+
+    })
+    $(".btn-close").click(function () {
+        $("#main-header").css("background", "rgba(255,255,255,1)");
+    })
+    //Hiện ra giới tính trong phần mô tả
+       if (@Model.Gender== 1) {
+           $("#gender-name").text("Nam");
+       }
+       else if (@Model.Gender== 0) {
+           $("#gender-name").text("Nữ")
+       }
+       else {
+           $("#gender-name").text("Unisex");
+    }
+    //Làm về tab trong phần mô tả
+    const detail = document.querySelector(".detail-product");
+    const guarantee = document.querySelector(".guarantee-product");
+    if (detail) {
+        detail.addEventListener("click", function () {
+            document.querySelector(".product-content-right-bottom-content-description-detail").style.display = "block";
+            document.querySelector(".detail-product").classList.add("border-detail");
+            document.querySelector(".guarantee-product").classList.remove("border-detail");
+            document.querySelector(".product-content-right-bottom-content-description-guarantee").style.display = "none";
+        })
+    }
+    if (guarantee) {
+        guarantee.addEventListener("click", function () {
+            document.querySelector(".product-content-right-bottom-content-description-detail").style.display = "none";
+            document.querySelector(".detail-product").classList.remove("border-detail");
+            document.querySelector(".guarantee-product").classList.add("border-detail");
+           document.querySelector(".product-content-right-bottom-content-description-guarantee").style.display = "block";
+        })
+    }
+    //  khi click vao arrow thi hien ra detail
+    const buttonArrow = document.querySelector(".product-content-right-bottom-top");
+    if (buttonArrow) {
+        buttonArrow.addEventListener("click", function () {
+            document.querySelector(".product-content-right-bottom-content").classList.toggle("activeB");
+        })
+    }
+    //khi click vào tham khảo size
+
+    $(".btn-size-detail").on("click", function () {
+        $(".modal").css('display', 'flex');
+
+    })
+    $(".btn-close").on("click", function () {
+        $(".modal").css('display', 'none');
+
+    })
+
+//thay đổi ảnh khi click
+
+      $(".img_1").on("click", function () {
+          $("#img_big").removeAttr("src");
+          $("#img_big").attr("src", "/image/@Model.ImgBig1");
+    });
+    $(".img_2").on("click", function () {
+
+        $("#img_big").removeAttr("src");
+        $("#img_big").attr("src", "/image/@Model.ImgBig2");
+   });
+    $(".img_3").on("click", function () {
+        $("#img_big").removeAttr("src");
+        $("#img_big").attr("src", "/image/@Model.ImgBig3");
+
+    });
+    $(".img_4").on("click", function () {
+        $("#img_big").removeAttr("src");
+        $("#img_big").attr("src", "/image/@Model.ImgBig4");
+
+    });
+    $(".img_5").on("click", function () {
+        $("#img_big").removeAttr("src");
+        $("#img_big").attr("src", "/image/@Model.ImgBig5");
+
+    });
+    $(".img_6").on("click", function () {
+        $("#img_big").removeAttr("src");
+        $("#img_big").attr("src", "/image/@Model.ImgBig6");
+
+    });
+//Kiểm tra xem chọn size chưa mới đc mua
+
+    $(".btn_buy").on("click", function () {
+        var load_check_size = $("#check_size_empty");
+        load_check_size.html("");
+        if ($("#load_size").text() == '') {
+            var str = '<span style="color:red;"> Vui lòng chọn size* </span>';
+            load_check_size.append(str);
+
+            return false;
+        }
+
+    });
+    $("#add-to-cart").on("click", function () {
+        var load_check_size = $("#check_size_empty");
+        load_check_size.html("");
+        if ($("#load_size").text() == '') {
+            var str = '<span style="color:red;"> Vui lòng chọn size* </span>';
+            load_check_size.append(str);
+
+            return false;
+        }
+        else {
+            var size_id = $("")
+            $.ajax({
+                 url: '@Url.Action("AddToCart", "Cart")',
+                 type: 'POST',
+                 dataType: 'JSON',
+                data: { colorId: @color_url, sizeId: $("#size-id").val(), productId: @productid_url, quantity: $("#input_quantity").val() },
+                success: function (data) {
+                    var cartList = $(".cart__list-list");
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Giỏ hàng được thêm thành công',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    setTimeout(()=>location.reload(), 1200);
+
+
+                }
+            })
+        }
+
+    });
+
+//Active màu của sản phẩm được chọn
+
+     $(".li-color").each(function (li_item, index){
+        var temp = $(this).val();
+         if (@color_url== temp) {
+             $(this).removeClass("li-default-border");
+             $(this).addClass("li-active-border");
+         }
+    })
+
+//Chọn size
+     $(".size-name").each(function (size_item, index) {
+
+            $(this).on("click", function () {
+                var size_id = $(this).val();
+                $("#size-id").val(size_id)
+                console.log($("#input_quantity").val());
+                $("#input_quantity").val(1); //Set lại value trogn input
+                var load_size = $("#load_size");
+                load_size.html("");
+                var current = document.getElementsByClassName("li-active-color");
+                current[0].className = current[0].className.replace(" li-active-color", "");
+                this.className += " li-active-color";
+                if ($(this).hasClass("li-default-border")) {
+                    $(this).removeClass("li-default-border");
+                    $(this).addClass("li-active-color")
+                }
+
+                $.ajax({
+                    url: '@Url.Action("GetSizeByID","size")',
+                    type: "POST",
+                    dataType: "JSON",
+                    data: { color_id: @color_url, size_id: size_id, product_id: @productid_url  },
+                    success: function (data) {
+                        data.forEach((element, inde, array) => {
+
+                            var quantity = element.quantity;
+
+                            var str = '<span id="size-value">' + element.sizeName + '</span>';
+                            var quantity_notify = '<span style="color:red">Sản phẩm này hiện đã hết hàng*</span>';
+                            var load_check_quantity = $("#check_quantity_empty");
+                            load_check_quantity.html("");
+                            load_size.append(str);
+                            if (quantity == 0) {
+
+                                $("#input_quantity").val(0);
+                                $("#input_quantity").attr("readonly", true);
+                                $("#input_quantity").css({ "border": "1px solid rgb(153,153,153)", "cursor": "not-allowed" });
+                                $("#btn_minus_id").css({ "cursor": "not-allowed" , "background":"rgb(153,153,153)"});
+                                $("#btn_plus_id").css({ "cursor": "not-allowed", "background": "rgb(153,153,153)" });
+                                $(".btn_buy_modify").css({ "cursor": "not-allowed", "color": "rgb(153,153,153)", "border": "2px solid rgb(153,153,153)"});
+                                $(".btn_buy_modify").mouseover(function () {
+                                    $(".btn_buy_modify").css({ "background": "white" });
+                                })
+                                load_check_quantity.append(quantity_notify);
+                                return false;
+                            }
+                            else {
+                                $("#input_quantity").attr({ "max": quantity });
+                            }
+                        })
+                    },
+                    error: () => alert("something wrong")
+                });
+            });
+     });
+    //Nút giảm số lượng sản phẩm
+       $("#btn_minus_id").on("click", function () {
+           var item = $("#input_quantity").val();
+           if ($("#size-value").text() == '') {
+               return false;
+           }
+           else if (item == 1) {
+               return false;
+           }
+           else {
+               $("#input_quantity").val(item - 1);
+               return true;
+           }
+       });
+    //Nút tăng số lượng sản phẩm
+       $("#btn_plus_id").on("click", function () {
+           var item_max = $("#input_quantity").attr("max");
+           var item = $("#input_quantity").val();
+           if ($("#size-value").text() == '') {
+               return false;
+           }
+           else if (item == item_max) {
+               return false;
+           }
+           else {
+               $("#input_quantity").val(parseInt(item) + parseInt(1));
+               return true;
+           }
+
+       });
+    $("#btn-checkout").click(async () => {
+
+        var load_check_size = $("#check_size_empty");
+        load_check_size.html("");
+        if ($("#load_size").text() == '') {
+            var str = '<span style="color:red;"> Vui lòng chọn size* </span>';
+            load_check_size.append(str);
+
+            return false;
+        }
+
+        var data = { colorId: @color_url, sizeId: $("#size-id").val(), productId: @productid_url};
+        jsonData = JSON.stringify(data)
+        fetch('@Url.Action("GetProductProductDetailId", "Product")',
+            {
+                method: "POST",
+                headers: {
+                    'Accept': 'appliaction/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+
+            }
+        ).then((res) => res.json())
+        .then(data => {
+
+            console.log("data ===", data.id)
+            var id = data.id
+            var arr = []
+            arr.push({ UserId: 0, ProductDetailId: id.toString(), Quantity: $("#input_quantity").val() })
+            jsonBody = JSON.stringify(arr);
+            console.log("json sent ==", jsonBody)
+            fetch('@Url.Action("SetCheckoutList", "Order")',
+            {
+                method: "POST",
+                headers: {
+                    'Accept': 'appliaction/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonBody)
+
+                }).then(res => location.href = '@Url.Action("Checkout","Order")')
+        })
+    })
+
+    $(".product-content-right-bottom-top").on("click", function () {
+        if ($(".product-content-right-bottom-content").hasClass("activeB") == true) {
+            $(".img-bottom-small").addClass("img-bottom-active");
+            $(".img-bottom-small").removeClass("img-bottom-regular");
+        }
+        else {
+            $(".img-bottom-small").addClass("img-bottom-regular");
+            $(".img-bottom-small").removeClass("img-bottom-active");
+        }
+
+    })
+
+    $(".img-small-item").each(function () {
+        $(this).on("click", function () {
+            var current = $(".active-small-img");
+            current[0].className = current[0].className.replace(" active-small-img", "");
+            $(this).addClass("active-small-img");
+
+        })
+
+    })
+
+//load comment
+    $(document).ready(function () {
+        var product_id = $(".comment_product_id").val();
+        load_comment();
+        function load_comment() {
+            // console.log(product_id);
+            $.ajax({
+                url: "../comment/ShowComment",
+                type: "POST",
+                dataType: "html",
+                data: { product_id: product_id },
+                success: function (data) {           //Xoá tất cả dữ liệu trước đó
+                    $("#comment-show").html(data);//load lại cái mới
+                },
+                error: () => alert("something wrong")
+            });
+        }
+        $(".btn-send-comment").on("click", function () {
+            var comment_name = $(".comment-name").val();
+            var comment_text = $(".comment-content").val();
+              var color_id = @color_url;
+            var comment_status = 0;
+            console.log(product_id);
+            $.ajax({
+                url: "../comment/InsertComment",
+                type: "POST",
+                dataType: "html",
+                data: { product_id: product_id, comment_name: comment_name, comment_text: comment_text, comment_status: comment_status, comment_color_id:color_id},
+                success: function (data) {           //Xoá tất cả dữ liệu trước đó
+                    $("#notify-comment").html(data); //load lại cái mới
+                    load_comment();
+                    $("#notify-comment").fadeOut(5000);
+                    $(".comment-name").val("");
+                    $(".comment-content").val("");
+                },
+                error: () => alert("something wrong")
+            });
+
+        })
+    });
+</script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

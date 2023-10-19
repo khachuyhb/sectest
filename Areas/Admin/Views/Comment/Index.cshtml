@@ -1,0 +1,190 @@
+﻿
+@{
+    ViewData["Title"] = "Comment";
+}
+<div class="container-fluid">
+    <div class="card border-info">
+        <div class="card-header d-flex justify-content-between">
+            <h3 class="card-title align-middle">Danh mục bình luận</h3>
+             <div id="notify-comment-admin"></div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table id="main_table" class="table-card align-middle" style="width:100%">
+                    <thead>
+                        <tr>
+
+                            <th scope="col">Tên người gửi</th>
+                            <th scope="col">Bình luận</th>
+                            <th scope="col">Ngày bình luận</th>
+                            <th scope="col">Sản phẩm</th>
+                            <th scope="col">Trạng thái</th>
+                            <th scope="col">Quản lý</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr scope="row">
+                            <td style="vertical-align:top;">@item.CommentName</td>
+
+                          
+
+
+                            <td >
+                                @item.CommentText
+                            <ul style="text-align: left; padding: unset; margin-top: 1rem; ">
+                               <span>Admin Reply:</span>
+                                @foreach (var com in item.listparentcomment)
+                                {
+                                    <li>@com.CommentText</li>
+                                }
+                            </ul>
+                            <p class="test"></p>
+                            <div class="@item.CommentStatus" id="list-comment-parent"></div>
+                            <textarea data-comment_id="@item.ID" class="reply-comment-text-@item.ID form-control" rows="3"></textarea><br />
+                            <button style="margin:10px 0;" class="btn-reply-admin btn-xs" data-color_id="@item.CommentColorID" data-comment_id="@item.ID" data-comment_product_id="@item.CommentProductID">Trả lời </button>
+                        </td>
+                        <td style="vertical-align:top;">@item.CommentDate</td>
+                        <td style="vertical-align:top;"><a style="color: blue;" href="../product/ShowProductDetailObject?product_id=@item.CommentProductID&color_id=@item.CommentColorID" target="_blank">@item.ProductName</a></td>
+
+                        @if (item.CommentStatus == 0)
+                        {
+                            <td style="vertical-align:top;"><input type="button" data-color_id="@item.CommentColorID" data-comment_status="1" data-comment_id="@item.ID" data-comment_product_id="@item.CommentProductID" style="width: 90px" class="btn btn-primary btn-sm comment_inactive_btn" value="Chưa duyệt" /></td>
+                        }
+                        @if (item.CommentStatus == 1)
+                        {
+                            <td style="vertical-align:top;"><input type="button" data-color_id="@item.CommentColorID" data-comment_status="0" data-comment_id="@item.ID" data-comment_product_id="@item.CommentProductID" style="width: 90px" class="btn btn-danger btn-sm comment_active_btn" value="Đã duyệt" /></td>
+                        }
+                        <td style="vertical-align:top;">
+                            <a><i class="far fa-trash-alt"></i></a>
+                        </td>
+                        </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    li{
+        list-style:none;
+    }
+    #main_table_filter {
+        margin-bottom: 10px;
+    }
+
+    .icon-eye-remove {
+        display: none;
+    }
+    .block .icon-eye-remove{
+        display: block;
+    }
+   
+</style>
+@section Scripts{
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowreorder/1.2.8/js/dataTables.rowReorder.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script>
+        $(".comment_inactive_btn").each(function () {
+            $(this).on("click", function () {
+                var comment_status = $(this).data("comment_status");
+                var comment_id = $(this).data("comment_id");
+                var comment_product_id = $(this).data("comment_product_id");
+                var color_id = $(this).data("color_id");
+                 
+               
+                $.ajax({
+                    url: "../comment/UpdateComment",
+                    type: "POST",
+                    dataType: "html",
+                    data: { product_id: comment_product_id, comment_id: comment_id, comment_status: comment_status, color_id: color_id },
+                    success: function (data) {           //Xoá tất cả dữ liệu trước đó                     
+                        alert("Duyệt thành công bình luận");
+                    },
+                    error: () => alert("something wrong")
+
+
+                });
+            })
+          
+            // location.reload(false);
+        });
+
+        $(".comment_active_btn").each(function () {
+            $(this).on("click", function () {
+
+                var comment_status = $(this).data("comment_status");
+                var comment_id = $(this).data("comment_id");
+                var comment_product_id = $(this).data("comment_product_id");
+                var color_id = $(this).data("color_id");                
+                $.ajax({
+                    url: "../comment/UpdateComment",
+                    type: "POST",
+                    dataType: "html",
+                    data: { product_id: comment_product_id, comment_id: comment_id, comment_status: comment_status, color_id: color_id },
+                    success: function (data) {           //Xoá tất cả dữ liệu trước đó                     
+                        alert("Huỷ duyệt bình luận");
+                    },
+                    error: () => alert("something wrong")
+
+                });
+            });
+            
+            // location.reload(false);
+        });
+
+        $(".btn-reply-admin").on("click", function () {
+            var comment_parent_comment = $(this).data("comment_id");
+            var comment_text = $(".reply-comment-text-" + comment_parent_comment).val();
+            var comment_product_id = $(this).data("comment_product_id");
+            var color_id = $(this).data("color_id");           
+            var comment_status = 1;
+            var comment_name = 'Admin';           
+            $.ajax({
+                url: "../comment/ReplyComment",
+                type: "POST",
+                dataType: "html",
+                data: { comment_name:comment_name, product_id: comment_product_id, comment_text: comment_text, comment_status: comment_status, comment_color_id: color_id, comment_parent_comment: comment_parent_comment },
+                success: function (data) {
+                    $(".reply-comment-" + comment_parent_comment).val('');//Xoá tất cả dữ liệu trước đó
+                    alert("Trả lời bình luận thành công");
+                },
+                error: () => alert("something wrong")
+            });
+        });
+
+
+        $(".btn-reply-admin").each(function () {
+            var comment_parent_comment = $(this).data("comment_id");
+
+            $.ajax({
+                url: "Comment/ShowCommentParent",
+                type: "Get",
+                dataType: "html",
+                data: { comment_id: comment_parent_comment },
+                success: function (data) {
+                  
+                    $("#list-comment-parent").html(data);
+
+                }
+              //  error: () => alert("something wrong")
+
+
+            });
+
+        });
+       
+
+
+    </script>
+}
